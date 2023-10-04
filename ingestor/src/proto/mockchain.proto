@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package mockchain;
+
+message Block {
+  string block_hash = 1;
+  string parent_hash = 2;
+  uint64 block_number = 3;
+  repeated Transaction transactions = 4;
+}
+
+message Transaction {
+  string hash = 1;
+  string from_addr = 2;
+  string to_addr = 3;
+  uint64 amount = 4;
+}

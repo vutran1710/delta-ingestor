@@ -1,0 +1,15 @@
+
+Ñ
+"ingestor/src/proto/mockchain.proto	mockchain"¦
+Block
+
+block_hash (	R	blockHash
+parent_hash (	R
+parentHash!
+block_number (RblockNumber:
+transactions (2.mockchain.TransactionRtransactions"o
+Transaction
+hash (	Rhash
+	from_addr (	RfromAddr
+to_addr (	RtoAddr
+amount (Ramountbproto3

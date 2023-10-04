@@ -1,0 +1,16 @@
+target/
+data/
+.DS_Store
+/.idea/
+*.sh
+gg.json
+/.vscode/
+/protobuf_rs/src/pb.rs
+secrets/
+node_modules/
+*.db
+secrets.toml
+config.toml
+parquet_ds/
+*.db.wal
+__pycache__/

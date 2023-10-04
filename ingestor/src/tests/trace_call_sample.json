@@ -1,0 +1,224 @@
+[
+  {
+    "action": {
+      "from": "0x541a319e7e75ca694504b2a7d2e9e480cd220311",
+      "callType": "call",
+      "gas": "0x6f48",
+      "input": "0xc2c7e2db331d2cf07fa7a802d4ab817e7201717bb640deff2dbeb478adb2fe36",
+      "to": "0x8e5a6e6fb4926284774a437241769f9b30c2f743",
+      "value": "0x77b1410bb9459000"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x0",
+      "output": "0x"
+    },
+    "subtraces": 0,
+    "traceAddress": [],
+    "transactionHash": "0x156d0e34df72bab2625202876b54a2f680ed36999a52e2c5da04718f5e0b9aba",
+    "transactionPosition": 0,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98",
+      "callType": "call",
+      "gas": "0x1f558",
+      "input": "0xa9059cbb00000000000000000000000000b0e4d4a78832e3590a7a67c44b28d8862cd8230000000000000000000000000000000000000000000511cd99e4b1261a380000",
+      "to": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x7613",
+      "output": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    "subtraces": 0,
+    "traceAddress": [],
+    "transactionHash": "0x438ca6980029942f002681eb9a6a6e940523c32c470d9dd1f5a5d9132e3c3f54",
+    "transactionPosition": 1,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0x12777ec0385d8b2d54caac233a744e7939fd8a5c",
+      "callType": "call",
+      "gas": "0x95ec",
+      "input": "0xa9059cbb0000000000000000000000007252e263c42112f2108943724eca77566a59a27b000000000000000000000000000000000000000000000000000001ee6a769300",
+      "to": "0x05237e2bd2dfab39a135d254cabae94b183c8bad",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x7e90",
+      "output": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    "subtraces": 0,
+    "traceAddress": [],
+    "transactionHash": "0x8e8f7ccdfc2eb48e8ea77d0292ddaea737ae870869b1eb0afb99704d092076ca",
+    "transactionPosition": 2,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0xb07a5123598dc4f20d331dfb90bb1a03994a747b",
+      "callType": "call",
+      "gas": "0x13244",
+      "input": "0xa9059cbb000000000000000000000000cffad3200574698b78f32232aa9d63eabd2907030000000000000000000000000000000000000000000000000000000049e8e600",
+      "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x6925",
+      "output": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    "subtraces": 1,
+    "traceAddress": [],
+    "transactionHash": "0x9bd6c877fa8f964ca352902b18d74042edaf78325c6a07145314ed4532d2c126",
+    "transactionPosition": 3,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "callType": "delegatecall",
+      "gas": "0x111a0",
+      "input": "0xa9059cbb000000000000000000000000cffad3200574698b78f32232aa9d63eabd2907030000000000000000000000000000000000000000000000000000000049e8e600",
+      "to": "0xa2327a938febf5fec13bacfb16ae10ecbc4cbdcf",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x4cac",
+      "output": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    "subtraces": 0,
+    "traceAddress": [
+      0
+    ],
+    "transactionHash": "0x9bd6c877fa8f964ca352902b18d74042edaf78325c6a07145314ed4532d2c126",
+    "transactionPosition": 3,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0x56431ce134259e4e2d579abdf608de487f25ab8c",
+      "callType": "call",
+      "gas": "0x26a6e",
+      "input": "0xe449022e0000000000000000000000000000000000000000000000004c53ecdc18a6000000000000000000000000000000000000000000000000000000000002447308320000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000000140000000000000000000000011b815efb8f581194ae79006d24e0d814b7697f6e26b9977",
+      "to": "0x1111111254eeb25477b68fb85ed929f73a960582",
+      "value": "0x4c53ecdc18a60000"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x188a2",
+      "output": "0x00000000000000000000000000000000000000000000000000000002475dbdaa"
+    },
+    "subtraces": 2,
+    "traceAddress": [],
+    "transactionHash": "0xdb11e40d24abf920ace76a527542bfa412984ed81c8da68fd0a3d9ca1b28e05a",
+    "transactionPosition": 4,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0x1111111254eeb25477b68fb85ed929f73a960582",
+      "callType": "call",
+      "gas": "0x2396b",
+      "input": "0xd0e30db0",
+      "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "value": "0x4c53ecdc18a60000"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x1ada",
+      "output": "0x"
+    },
+    "subtraces": 0,
+    "traceAddress": [
+      0
+    ],
+    "transactionHash": "0xdb11e40d24abf920ace76a527542bfa412984ed81c8da68fd0a3d9ca1b28e05a",
+    "transactionPosition": 4,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0x1111111254eeb25477b68fb85ed929f73a960582",
+      "callType": "call",
+      "gas": "0x21147",
+      "input": "0x128acb0800000000000000000000000056431ce134259e4e2d579abdf608de487f25ab8c00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000004c53ecdc18a6000000000000000000000000000000000000000000000000000000000001000276a400000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000001111111254eeb25477b68fb85ed929f73a960582",
+      "to": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x135d7",
+      "output": "0x0000000000000000000000000000000000000000000000004c53ecdc18a60000fffffffffffffffffffffffffffffffffffffffffffffffffffffffdb8a24256"
+    },
+    "subtraces": 4,
+    "traceAddress": [
+      1
+    ],
+    "transactionHash": "0xdb11e40d24abf920ace76a527542bfa412984ed81c8da68fd0a3d9ca1b28e05a",
+    "transactionPosition": 4,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+      "callType": "call",
+      "gas": "0x1795a",
+      "input": "0xa9059cbb00000000000000000000000056431ce134259e4e2d579abdf608de487f25ab8c00000000000000000000000000000000000000000000000000000002475dbdaa",
+      "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x5fb5",
+      "output": "0x"
+    },
+    "subtraces": 0,
+    "traceAddress": [
+      1,
+      0
+    ],
+    "transactionHash": "0xdb11e40d24abf920ace76a527542bfa412984ed81c8da68fd0a3d9ca1b28e05a",
+    "transactionPosition": 4,
+    "type": "call"
+  },
+  {
+    "action": {
+      "from": "0x11b815efb8f581194ae79006d24e0d814b7697f6",
+      "callType": "staticcall",
+      "gas": "0x1183a",
+      "input": "0x70a0823100000000000000000000000011b815efb8f581194ae79006d24e0d814b7697f6",
+      "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "value": "0x0"
+    },
+    "blockHash": "0x90c7025028eaa8b03a61e261838106fb3246cd54bd67cbcb1bb64e7ed05348df",
+    "blockNumber": 16966728,
+    "result": {
+      "gasUsed": "0x9e6",
+      "output": "0x000000000000000000000000000000000000000000000354d64372b319ccc402"
+    },
+    "subtraces": 0,
+    "traceAddress": [
+      1,
+      1
+    ],
+    "transactionHash": "0xdb11e40d24abf920ace76a527542bfa412984ed81c8da68fd0a3d9ca1b28e05a",
+    "transactionPosition": 4,
+    "type": "call"
+  }
+]

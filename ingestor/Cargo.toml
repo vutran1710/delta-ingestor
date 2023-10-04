@@ -1,0 +1,24 @@
+[package]
+name = "ingestor"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "ingestor"
+path = "src/main.rs"
+
+[dependencies]
+common_libs = { path = "../common_libs" }
+metrics = { path = "../metrics" }
+serde = { version = "1.0.160", features = ["derive"] }
+toml = "0.7.3"
+serde_json = "1.0.96"
+web3 = "0.19.0"
+prost = "0.11.9"
+prost-types = "0.11.9"
+strum = { version = "0.25.0", features = ["derive"] }
+lazy_static = "1.4.0"
+rand = "0.8.5"
+
+[dev-dependencies]
+comfy-table = "6.1.4"
