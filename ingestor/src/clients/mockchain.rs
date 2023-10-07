@@ -8,7 +8,7 @@ use common_libs::envy;
 use common_libs::futures::future::join_all;
 use common_libs::log::info;
 use common_libs::log::warn;
-use common_libs::tokio::sync::Mutex;
+use common_libs::tokio::sync::RwLock;
 use common_libs::tokio::time::sleep;
 use common_libs::tokio::time::Duration;
 use serde::Deserialize;
@@ -24,20 +24,20 @@ pub enum BlockID {
 #[derive(Debug)]
 pub struct ChainFork {
     pub fork_id: u8,
-    pub blocks: Arc<Mutex<Vec<Block>>>,
+    pub blocks: Arc<RwLock<Vec<Block>>>,
 }
 
 impl ChainFork {
     pub fn new(fork_id: u8) -> Self {
         Self {
             fork_id,
-            blocks: Arc::new(Mutex::new(vec![])),
+            blocks: Arc::new(RwLock::new(vec![])),
         }
     }
 
     pub async fn mine(&self, start_block: Option<Block>) -> Block {
         let data = format!("this is fork#{}", self.fork_id);
-        let mut blocks = self.blocks.lock().await;
+        let mut blocks = self.blocks.write().await;
         let block = match (blocks.last().map(|b| b.to_owned()), start_block) {
             (Some(prev_block), _) | (None, Some(prev_block)) => {
                 let number = prev_block.get_number() + 1;
@@ -55,7 +55,7 @@ impl ChainFork {
     }
 
     pub async fn get_block(&self, block_id: BlockID) -> Option<Block> {
-        let blocks = self.blocks.lock().await;
+        let blocks = self.blocks.read().await;
         if blocks.is_empty() {
             return None;
         }
@@ -73,8 +73,8 @@ pub struct MockChainEnvars {
 
 #[derive(Clone)]
 pub struct MockChain {
-    pub chain: Arc<Mutex<Vec<u8>>>,
-    pub forks: Arc<Mutex<Vec<ChainFork>>>,
+    pub chain: Arc<RwLock<Vec<u8>>>,
+    pub forks: Arc<RwLock<Vec<ChainFork>>>,
 }
 
 impl MockChain {
@@ -82,14 +82,14 @@ impl MockChain {
         let genesis_fork = ChainFork::new(0);
         genesis_fork.mine(None).await;
         warn!("Mined the Genesis block#0");
-        let forks = Arc::new(Mutex::new(vec![genesis_fork]));
-        let chain = Arc::new(Mutex::new(vec![0]));
+        let forks = Arc::new(RwLock::new(vec![genesis_fork]));
+        let chain = Arc::new(RwLock::new(vec![0]));
         Self { chain, forks }
     }
 
     pub async fn get_block(&self, block_id: BlockID) -> Option<Block> {
-        let chain = self.chain.lock().await;
-        let forks = self.forks.lock().await;
+        let chain = self.chain.read().await;
+        let forks = self.forks.read().await;
         let fork_idx = match block_id {
             BlockID::Latest => chain.iter().last().unwrap().to_owned(),
             BlockID::Number(number) => chain.iter().nth(number as usize)?.to_owned(),
@@ -107,7 +107,7 @@ impl MockChain {
     }
 
     pub async fn count(&self) -> usize {
-        self.chain.lock().await.len()
+        self.chain.read().await.len()
     }
 
     #[cfg(test)]
@@ -125,10 +125,10 @@ impl MockChain {
 
     pub async fn mine(&self) {
         let latest_block = self.get_block(BlockID::Latest).await;
-        let forks = self.forks.lock().await;
+        let forks = self.forks.read().await;
         let fork = forks.iter().last().unwrap();
         fork.mine(latest_block).await;
-        let mut chain = self.chain.lock().await;
+        let mut chain = self.chain.write().await;
         chain.push(fork.fork_id);
     }
 
@@ -162,8 +162,8 @@ impl MockChain {
         warn!("Reorg at block=#{}", at_block);
         let prev_block = self.get_block(BlockID::Number(at_block - 1)).await;
         let latest_block = self.get_block(BlockID::Latest).await.unwrap();
-        let mut forks = self.forks.lock().await;
-        let mut chain = self.chain.lock().await;
+        let mut forks = self.forks.write().await;
+        let mut chain = self.chain.write().await;
 
         let new_fork_idx = forks.len();
         let new_fork = ChainFork::new(new_fork_idx as u8);
