@@ -70,9 +70,12 @@ impl DeltaLakeProducer {
         let deltalake_cfg = envy::from_env::<DeltaLakeConfig>().unwrap();
 
         // NOTE: At this point, table-path always exists! Safe to call unwrap()
-        // NOTE: probably no config needed
-        let (table, is_create_new) =
-            Self::open_table(&deltalake_cfg.table_path, table_schemas, HashMap::new()).await?;
+        let (table, is_create_new) = Self::open_table(
+            &deltalake_cfg.table_path,
+            table_schemas,
+            DeltaLakeProducer::get_table_config(),
+        )
+        .await?;
 
         if !is_create_new {
             info!("Opened existing table");
@@ -96,6 +99,26 @@ impl DeltaLakeProducer {
             table_path: deltalake_cfg.table_path,
         };
         Ok(delta_lake_client)
+    }
+
+    fn get_table_config() -> HashMap<DeltaConfigKey, Option<String>> {
+        let mut table_config = HashMap::new();
+        table_config.insert(DeltaConfigKey::AppendOnly, Some("true".to_string()));
+        table_config.insert(
+            DeltaConfigKey::AutoOptimizeAutoCompact,
+            Some("true".to_string()),
+        );
+        // TODO: we should determine the exact value here
+        // table_config.insert(
+        //     DeltaConfigKey::LogRetentionDuration,
+        //     Some("100".to_string()),
+        // );
+        // table_config.insert(
+        //     DeltaConfigKey::DeletedFileRetentionDuration,
+        //     Some("20".to_string()),
+        // );
+        // table_config.insert(DeltaConfigKey::CheckpointInterval, Some("10".to_string()));
+        return table_config;
     }
 
     pub async fn open_table(
