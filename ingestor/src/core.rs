@@ -23,7 +23,7 @@ use metrics::Registry;
 use std::sync::Arc;
 
 pub fn get_block_numbers<B: BlockTrait>(blocks: &[B]) -> Vec<u64> {
-    vec![blocks[0].get_number(), blocks.last().unwrap().get_number()]
+    blocks.iter().map(|b| b.get_number()).collect()
 }
 
 pub fn create_ranges(
@@ -132,10 +132,7 @@ pub trait IngestorTrait<B: BlockTrait>: Send + Sync {
         let first = blocks.first().unwrap().get_number();
         let last = blocks.last().unwrap().get_number();
         metrics.downloaded_blocks_counter.inc_by(count as u64);
-        log::info!(
-            "fetched {count} blocks: ({first} - {last}) {:?}",
-            get_block_numbers(&blocks)
-        );
+        log::info!("fetched {count} blocks: ({first} - {last})",);
 
         Ok(blocks)
     }
