@@ -21,6 +21,7 @@ pub enum Producer<B: BlockTrait> {
     StdOut(StdOutProducer<B>),
     #[strum(serialize = "Delta-Producer")]
     DeltaLake(DeltaLakeProducer),
+    Nats(nats::NatsProducer),
 }
 
 #[async_trait]
@@ -29,6 +30,7 @@ impl<B: BlockTrait> ProducerTrait<B> for Producer<B> {
         match self {
             Producer::StdOut(producer) => producer.publish_blocks(blocks).await,
             Producer::DeltaLake(producer) => producer.publish_blocks(blocks).await,
+            Producer::Nats(producer) => producer.publish_blocks(blocks).await,
         }
     }
 }
@@ -43,7 +45,12 @@ pub async fn create_producer<B: BlockTrait>(
             info!("Setting up DeltaLake Producer");
             let producer = DeltaLakeProducer::new(cfg).await?;
             Ok(Producer::DeltaLake(producer))
-        }
+        },
+        "nats" => {
+            info!("Setting up Nats Producer");
+            let producer = nats::NatsProducer::new()?;
+            Ok(Producer::Nats(producer))
+        },
         _ => {
             info!("Unknown Producer type, using stdout as Producer");
             let producer = StdOutProducer::new();
