@@ -1,6 +1,9 @@
+use std::fs::File;
+use std::io::Write;
 use google_cloud_googleapis::pubsub::v1::PubsubMessage;
 use prost::Message;
 use common_libs::async_trait::async_trait;
+use common_libs::log;
 use crate::core::ProducerTrait;
 use crate::errors::ProducerError;
 use crate::proto::BlockTrait;
@@ -51,15 +54,11 @@ impl<B: BlockTrait> ProducerTrait<B> for NatsProducer {
         for block in blocks {
             match self.mode {
                 PublishMode::Bytes => {
-                    let publish_message = PubsubMessage {
-                        data: block.encode_to_vec(),
-                        ..Default::default()
-                    };
-                    self.publish(&publish_message.encode_to_vec()).await?;
+                    self.publish(block.encode_to_vec().as_slice())?;
                 }
                 PublishMode::String => {
                     let block_json = serde_json::to_string(&block).unwrap();
-                    self.publish(&block_json.as_bytes()).await?;
+                    self.publish(&block_json.as_bytes())?;
                 }
             }
 
