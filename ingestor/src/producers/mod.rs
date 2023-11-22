@@ -1,5 +1,6 @@
 mod delta;
 mod stdout;
+mod nats;
 
 use delta::DeltaLakeProducer;
 use stdout::StdOutProducer;

@@ -19,6 +19,8 @@ prost-types = "0.11.9"
 strum = { version = "0.25.0", features = ["derive"] }
 lazy_static = "1.4.0"
 rand = "0.8.5"
+nats = "0.24.1"
+google-cloud-googleapis = { version = "0.11.1", features = ["pubsub"] }
 
 [dev-dependencies]
 comfy-table = "6.1.4"
