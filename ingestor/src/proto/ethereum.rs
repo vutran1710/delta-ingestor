@@ -1,6 +1,11 @@
 use serde::Deserialize;
 use serde::Serialize;
-
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Blocks {
+    #[prost(bytes="vec", repeated, tag="1")]
+    pub ethereum_blocks: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
+}
 // @generated
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message, Serialize, Deserialize)]

@@ -7,6 +7,7 @@ use common_libs::log;
 use crate::core::ProducerTrait;
 use crate::errors::ProducerError;
 use crate::proto::BlockTrait;
+use crate::proto::ethereum::Blocks;
 
 #[derive(Clone)]
 enum PublishMode {
@@ -51,18 +52,23 @@ impl NatsProducer {
 #[async_trait]
 impl<B: BlockTrait> ProducerTrait<B> for NatsProducer {
     async fn publish_blocks(&self, blocks: Vec<B>) -> Result<(), ProducerError> {
-        for block in blocks {
-            match self.mode {
-                PublishMode::Bytes => {
-                    self.publish(block.encode_to_vec().as_slice())?;
-                }
-                PublishMode::String => {
+        match self.mode {
+            PublishMode::Bytes => {
+                let all_blocks = blocks.into_iter().map(|b| b.encode_to_vec()).collect::<Vec<Vec<u8>>>();
+                let full_block = Blocks{
+                    ethereum_blocks: all_blocks
+                };
+                self.publish(full_block.encode_to_vec().as_slice())?;
+            }
+            PublishMode::String => {
+                for block in blocks {
                     let block_json = serde_json::to_string(&block).unwrap();
                     self.publish(&block_json.as_bytes())?;
+
                 }
             }
-
         }
+
         Ok(())
     }
 }
