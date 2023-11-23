@@ -1,0 +1,14 @@
+[ethereum]
+with_trace = false
+rpc = [
+    { endpoint = "https://eth.llamarpc.com", weight = 1 },
+    { endpoint = "https://ethereum.kyberengineering.io", weight = 1 },
+    { endpoint = "https://api.securerpc.com/v1", weight = 1 },
+    { endpoint = "https://ethereum.publicnode.com", weight = 1 },
+]
+data_sample = [
+    { block_number = 16015564, txs = 220, logs = 389 },
+    { block_number = 16015570, txs = 105, logs = 254 },
+    { block_number = 16515594, txs = 324, logs = 1056 },
+    { block_number = 17513099, txs = 208, logs = 293 }
+]

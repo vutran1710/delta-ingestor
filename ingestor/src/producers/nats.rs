@@ -55,10 +55,16 @@ impl<B: BlockTrait> ProducerTrait<B> for NatsProducer {
         match self.mode {
             PublishMode::Bytes => {
                 let all_blocks = blocks.into_iter().map(|b| b.encode_to_vec()).collect::<Vec<Vec<u8>>>();
-                let full_block = Blocks{
+                let full_blocks = Blocks {
                     ethereum_blocks: all_blocks
                 };
-                self.publish(full_block.encode_to_vec().as_slice())?;
+                self.publish(&full_blocks.encode_to_vec()).map_err(|e| {
+                    log::error!("Publish err size: {:?}", full_blocks.encode_to_vec().len());
+                    e
+                })?;
+                // for block in all_blocks {
+                //     self.publish(&block)?;
+                // }
             }
             PublishMode::String => {
                 for block in blocks {
