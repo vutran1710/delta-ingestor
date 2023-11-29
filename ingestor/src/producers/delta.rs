@@ -51,7 +51,6 @@ pub struct DeltaLakeConfig {
 #[derive(Clone)]
 pub struct DeltaLakeProducer {
     table: Arc<Mutex<DeltaTable>>,
-    writer: Arc<Mutex<RecordBatchWriter>>,
     schema_ref: Arc<ArrowSchema>,
     chain_name: String,
     table_path: String,
@@ -90,10 +89,8 @@ impl DeltaLakeProducer {
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
         let schema_ref = Arc::new(arrow_schema);
 
-        let writer = RecordBatchWriter::for_table(&table)?;
         let delta_lake_client = Self {
             table: Arc::new(Mutex::new(table)),
-            writer: Arc::new(Mutex::new(writer)),
             schema_ref,
             chain_name,
             table_path: deltalake_cfg.table_path,
@@ -170,10 +167,8 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             .map(|b| {
                 let json_val = serde_json::to_value(&b).unwrap();
                 let timestamp = b.get_writer_timestamp();
-                let number_partition = b.get_number() % 10000;
                 let mut current_value = json_val.as_object().unwrap().to_owned();
                 current_value.insert("created_at".to_string(), json!(timestamp));
-                current_value.insert("number_partition".to_string(), json!(number_partition));
                 serde_json::to_string(&current_value).unwrap()
             })
             .collect::<Vec<String>>()
@@ -182,14 +177,14 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
         info!("Blocks serialized as json & joined as line-delimited");
 
         let mut table = self.table.lock().await;
-        let mut writer = self.writer.lock().await;
+        let mut writer = RecordBatchWriter::for_table(&table)?;
 
         let buf_reader = BufReader::new(content.as_bytes());
         let reader = ReaderBuilder::new(self.schema_ref.clone());
         let mut reader = reader.build(buf_reader).unwrap();
         let batch = reader.next().unwrap().unwrap();
 
-        writer.write(batch).await.unwrap();
+        writer.write(batch).await?;
 
         info!("Committing data to delta lake");
         let adds = writer.flush_and_commit(&mut table).await?;
