@@ -30,4 +30,4 @@ hex = "0.4.3"
 crossbeam-queue = "0.3.8"
 envy = "0.4.2"
 sha2 = "0.10.7"
-deltalake = { version = "0.16.0", features = ["s3"] }
+deltalake = { version = "0.16.5", features = ["s3"] }
