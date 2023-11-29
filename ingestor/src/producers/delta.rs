@@ -180,10 +180,10 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
         let mut writer = RecordBatchWriter::for_table(&table)?;
 
         let buf_reader = BufReader::new(content.as_bytes());
-        let reader = ReaderBuilder::new(self.schema_ref.clone());
+        let reader = ReaderBuilder::new(self.schema_ref.clone()).with_batch_size(blocks.len());
         let mut reader = reader.build(buf_reader).unwrap();
         let batch = reader.next().unwrap().unwrap();
-
+        info!("RecordBatch -> rows = {}", batch.num_rows());
         writer.write(batch).await?;
 
         info!("Committing data to delta lake");
