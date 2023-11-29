@@ -51,6 +51,7 @@ pub struct DeltaLakeConfig {
 #[derive(Clone)]
 pub struct DeltaLakeProducer {
     table: Arc<Mutex<DeltaTable>>,
+    writer: Arc<Mutex<RecordBatchWriter>>,
     schema_ref: Arc<ArrowSchema>,
     chain_name: String,
     table_path: String,
@@ -89,8 +90,10 @@ impl DeltaLakeProducer {
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
         let schema_ref = Arc::new(arrow_schema);
 
+        let writer = RecordBatchWriter::for_table(&table)?;
         let delta_lake_client = Self {
             table: Arc::new(Mutex::new(table)),
+            writer: Arc::new(Mutex::new(writer)),
             schema_ref,
             chain_name,
             table_path: deltalake_cfg.table_path,
@@ -177,7 +180,7 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
         info!("Blocks serialized as json & joined as line-delimited");
 
         let mut table = self.table.lock().await;
-        let mut writer = RecordBatchWriter::for_table(&table)?;
+        let mut writer = self.writer.lock().await;
 
         let buf_reader = BufReader::new(content.as_bytes());
         let reader = ReaderBuilder::new(self.schema_ref.clone()).with_batch_size(blocks.len());
