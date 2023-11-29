@@ -1,3 +1,15 @@
+# Quick start
+```sh
+./target/release/ingestor \
+--start-block 10000000 \
+--stop-block 10150000 \
+--batch 50 \
+--task-limit 50 \
+--channel-size 2 \
+--config secrets/ethereum.toml \
+--request-timeout 50 --producer delta --resumer redis://localhost:6379 --block-descriptor ./ingestor/src/proto/ethereum.desc
+```
+
 # Delta Ingestor
 
 Ingest block data from Blockchain node & save to DeltaLake.

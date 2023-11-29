@@ -170,8 +170,10 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             .map(|b| {
                 let json_val = serde_json::to_value(&b).unwrap();
                 let timestamp = b.get_writer_timestamp();
+                let number_partition = b.get_number() % 10000;
                 let mut current_value = json_val.as_object().unwrap().to_owned();
                 current_value.insert("created_at".to_string(), json!(timestamp));
+                current_value.insert("number_partition".to_string(), json!(number_partition));
                 serde_json::to_string(&current_value).unwrap()
             })
             .collect::<Vec<String>>()
