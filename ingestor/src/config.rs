@@ -69,9 +69,6 @@ pub struct CommandConfig {
     #[clap(long, env = "BLOCK_TIME", default_value_t = 20)]
     #[arg(long = "block-time", default_value_t = 20)]
     pub block_time: u16,
-    #[clap(long, env = "BLOCK_DESCRIPTOR")]
-    #[arg(long = "block-descriptor")]
-    pub block_descriptor: Option<String>,
 }
 
 impl Default for CommandConfig {

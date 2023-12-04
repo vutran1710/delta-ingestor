@@ -1,11 +1,11 @@
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashMap;
-use std::io::BufReader;
 use std::sync::Arc;
 
 use common_libs::async_trait::async_trait;
-use common_libs::delta_utils;
+use common_libs::deltalake::arrow::array::*;
 use common_libs::deltalake::arrow::datatypes::Schema as ArrowSchema;
-use common_libs::deltalake::arrow::json::ReaderBuilder;
 use common_libs::deltalake::operations::create::CreateBuilder;
 use common_libs::deltalake::schema::Schema;
 use common_libs::deltalake::schema::SchemaDataType;
@@ -19,11 +19,6 @@ use common_libs::deltalake::SchemaField;
 use common_libs::envy;
 use common_libs::log::info;
 use common_libs::tokio::sync::Mutex;
-use common_libs::utils;
-
-use serde::Deserialize;
-use serde::Serialize;
-use serde_json::json;
 
 use crate::config::CommandConfig;
 use crate::core::ProducerTrait;
@@ -59,20 +54,43 @@ pub struct DeltaLakeProducer {
 
 impl DeltaLakeProducer {
     pub async fn new(cfg: &CommandConfig) -> Result<Self, ProducerError> {
-        assert!(
-            cfg.block_descriptor.is_some(),
-            "Block descriptor is required"
-        );
-        let block_descriptor_file =
-            utils::load_file(cfg.block_descriptor.clone().unwrap().as_str());
-        let (chain_name, table_schemas) =
-            delta_utils::analyze_proto_descriptor(block_descriptor_file);
         let deltalake_cfg = envy::from_env::<DeltaLakeConfig>().unwrap();
 
         // NOTE: At this point, table-path always exists! Safe to call unwrap()
         let (table, is_create_new) = Self::open_table(
             &deltalake_cfg.table_path,
-            table_schemas,
+            vec![
+                SchemaField::new(
+                    "block_number".to_string(),
+                    SchemaDataType::primitive("long".to_string()),
+                    false,
+                    HashMap::default(),
+                ),
+                SchemaField::new(
+                    "hash".to_string(),
+                    SchemaDataType::primitive("string".to_string()),
+                    false,
+                    HashMap::default(),
+                ),
+                SchemaField::new(
+                    "parent_hash".to_string(),
+                    SchemaDataType::primitive("string".to_string()),
+                    false,
+                    HashMap::default(),
+                ),
+                SchemaField::new(
+                    "block_data".to_string(),
+                    SchemaDataType::primitive("binary".to_string()),
+                    false,
+                    HashMap::default(),
+                ),
+                SchemaField::new(
+                    "created_at".to_string(),
+                    SchemaDataType::primitive("long".to_string()),
+                    false,
+                    HashMap::default(),
+                ),
+            ],
             DeltaLakeProducer::get_table_config(),
         )
         .await?;
@@ -95,7 +113,7 @@ impl DeltaLakeProducer {
             table: Arc::new(Mutex::new(table)),
             writer: Arc::new(Mutex::new(writer)),
             schema_ref,
-            chain_name,
+            chain_name: cfg.chain.to_string(),
             table_path: deltalake_cfg.table_path,
         };
         Ok(delta_lake_client)
@@ -165,27 +183,31 @@ impl DeltaLakeProducer {
 #[async_trait]
 impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
     async fn publish_blocks(&self, blocks: Vec<B>) -> Result<(), ProducerError> {
-        let content = blocks
-            .iter()
-            .map(|b| {
-                let json_val = serde_json::to_value(&b).unwrap();
-                let timestamp = b.get_writer_timestamp();
-                let mut current_value = json_val.as_object().unwrap().to_owned();
-                current_value.insert("created_at".to_string(), json!(timestamp));
-                serde_json::to_string(&current_value).unwrap()
-            })
-            .collect::<Vec<String>>()
-            .join("\n");
+        let mut block_numbers = vec![];
+        let mut block_hashes = vec![];
+        let mut block_parent_hashes = vec![];
+        let mut block_data = vec![];
+        let mut created_ats = vec![];
 
-        info!("Blocks serialized as json & joined as line-delimited");
+        for block in blocks {
+            block_numbers.push(block.get_number());
+            block_hashes.push(block.get_hash());
+            block_parent_hashes.push(block.get_parent_hash());
+            block_data.push(block.encode_to_vec().as_ref());
+            created_ats.push(block.get_writer_timestamp());
+        }
 
+        let arrow_array: Vec<Arc<dyn Array>> = vec![
+            Arc::new(UInt64Array::from(block_numbers)),
+            Arc::new(StringArray::from(block_hashes)),
+            Arc::new(StringArray::from(block_parent_hashes)),
+            Arc::new(BinaryArray::from_vec(block_data)),
+            Arc::new(UInt64Array::from(created_ats)),
+        ];
+        let batch = RecordBatch::try_new(self.schema_ref, arrow_array).unwrap();
         let mut table = self.table.lock().await;
         let mut writer = self.writer.lock().await;
 
-        let buf_reader = BufReader::new(content.as_bytes());
-        let reader = ReaderBuilder::new(self.schema_ref.clone()).with_batch_size(blocks.len());
-        let mut reader = reader.build(buf_reader).unwrap();
-        let batch = reader.next().unwrap().unwrap();
         info!("RecordBatch -> rows = {}", batch.num_rows());
         writer.write(batch).await?;
 
