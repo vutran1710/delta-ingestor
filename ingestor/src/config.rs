@@ -91,7 +91,6 @@ impl Default for CommandConfig {
             resumer_key: None,
             resumer: None,
             producer: None,
-            block_descriptor: None,
         }
     }
 }

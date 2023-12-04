@@ -106,6 +106,8 @@ impl DeltaLakeProducer {
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
         let arrow_schema = <ArrowSchema as TryFrom<&Schema>>::try_from(&metadata.schema.clone())
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
+
+        assert_eq!(arrow_schema.fields.len(), 5);
         let schema_ref = Arc::new(arrow_schema);
 
         let writer = RecordBatchWriter::for_table(&table)?;
@@ -160,12 +162,6 @@ impl DeltaLakeProducer {
                 let table = CreateBuilder::default()
                     .with_object_store(table.object_store())
                     .with_columns(columns)
-                    .with_column(
-                        "created_at",
-                        SchemaDataType::primitive("long".to_string()),
-                        false,
-                        None,
-                    )
                     .with_configuration(table_config)
                     .await
                     .unwrap();
@@ -193,7 +189,8 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             block_numbers.push(block.get_number());
             block_hashes.push(block.get_hash());
             block_parent_hashes.push(block.get_parent_hash());
-            block_data.push(block.encode_to_vec().as_ref());
+            let binding = block.encode_to_vec();
+            block_data.push(binding);
             created_ats.push(block.get_writer_timestamp());
         }
 
@@ -201,10 +198,11 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             Arc::new(UInt64Array::from(block_numbers)),
             Arc::new(StringArray::from(block_hashes)),
             Arc::new(StringArray::from(block_parent_hashes)),
-            Arc::new(BinaryArray::from_vec(block_data)),
+            Arc::new(BinaryArray::from_iter_values(block_data)),
             Arc::new(UInt64Array::from(created_ats)),
         ];
-        let batch = RecordBatch::try_new(self.schema_ref, arrow_array).unwrap();
+
+        let batch = RecordBatch::try_new(self.schema_ref.clone(), arrow_array).unwrap();
         let mut table = self.table.lock().await;
         let mut writer = self.writer.lock().await;
 
