@@ -186,20 +186,20 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
         let mut created_ats = vec![];
 
         for block in blocks {
-            block_numbers.push(block.get_number());
+            block_numbers.push(block.get_number() as i64);
             block_hashes.push(block.get_hash());
             block_parent_hashes.push(block.get_parent_hash());
             let binding = block.encode_to_vec();
             block_data.push(binding);
-            created_ats.push(block.get_writer_timestamp());
+            created_ats.push(block.get_writer_timestamp() as i64);
         }
 
         let arrow_array: Vec<Arc<dyn Array>> = vec![
-            Arc::new(UInt64Array::from(block_numbers)),
+            Arc::new(Int64Array::from(block_numbers)),
             Arc::new(StringArray::from(block_hashes)),
             Arc::new(StringArray::from(block_parent_hashes)),
             Arc::new(BinaryArray::from_iter_values(block_data)),
-            Arc::new(UInt64Array::from(created_ats)),
+            Arc::new(Int64Array::from(created_ats)),
         ];
 
         let batch = RecordBatch::try_new(self.schema_ref.clone(), arrow_array).unwrap();
