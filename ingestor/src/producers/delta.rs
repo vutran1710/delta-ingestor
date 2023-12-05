@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::sync::Arc;
 
 use common_libs::async_trait::async_trait;
@@ -50,7 +51,7 @@ pub struct DeltaLakeProducer {
     schema_ref: Arc<ArrowSchema>,
     chain_name: String,
     table_path: String,
-    block_zorder: u32,
+    block_partition: u32,
 }
 
 impl DeltaLakeProducer {
@@ -63,6 +64,12 @@ impl DeltaLakeProducer {
             vec![
                 SchemaField::new(
                     "block_number".to_string(),
+                    SchemaDataType::primitive("long".to_string()),
+                    false,
+                    HashMap::default(),
+                ),
+                SchemaField::new(
+                    "block_partition".to_string(),
                     SchemaDataType::primitive("long".to_string()),
                     false,
                     HashMap::default(),
@@ -102,6 +109,8 @@ impl DeltaLakeProducer {
             info!("Created new table");
         }
 
+        info!("block-parition = {}", cfg.block_partition);
+
         let metadata = table
             .get_metadata()
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
@@ -117,7 +126,7 @@ impl DeltaLakeProducer {
             schema_ref,
             chain_name: cfg.chain.to_string(),
             table_path: deltalake_cfg.table_path,
-            block_zorder: cfg.block_zorder,
+            block_partition: cfg.block_partition,
         };
         Ok(delta_lake_client)
     }
@@ -127,11 +136,15 @@ impl DeltaLakeProducer {
         table_config.insert(DeltaConfigKey::AppendOnly, Some("true".to_string()));
         table_config.insert(
             DeltaConfigKey::AutoOptimizeAutoCompact,
+            Some("auto".to_string()),
+        );
+        table_config.insert(
+            DeltaConfigKey::AutoOptimizeOptimizeWrite,
             Some("true".to_string()),
         );
         table_config.insert(
             DeltaConfigKey::DataSkippingNumIndexedCols,
-            Some("1".to_string()),
+            Some("2".to_string()),
         );
         return table_config;
     }
@@ -161,6 +174,7 @@ impl DeltaLakeProducer {
                     .with_object_store(table.object_store())
                     .with_columns(columns)
                     .with_configuration(table_config)
+                    .with_partition_columns(vec!["block_partition".to_string()])
                     .await
                     .unwrap();
 
@@ -178,13 +192,19 @@ impl DeltaLakeProducer {
 impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
     async fn publish_blocks(&self, blocks: Vec<B>) -> Result<(), ProducerError> {
         let mut block_numbers = vec![];
+        let mut block_partitions = vec![];
         let mut block_hashes = vec![];
         let mut block_parent_hashes = vec![];
         let mut block_data = vec![];
         let mut created_ats = vec![];
 
+        let mut partition_set = HashSet::new();
+
         for block in blocks {
             block_numbers.push(block.get_number() as i64);
+            let partition_number = block.get_number() / self.block_partition as u64;
+            partition_set.insert(partition_number);
+            block_partitions.push(partition_number as i64);
             block_hashes.push(block.get_hash());
             block_parent_hashes.push(block.get_parent_hash());
             let block_bytes = block.encode_to_vec();
@@ -192,8 +212,11 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             created_ats.push(block.get_writer_timestamp() as i64);
         }
 
+        info!("block batch partition set = {:?}", partition_set);
+
         let arrow_array: Vec<Arc<dyn Array>> = vec![
             Arc::new(Int64Array::from(block_numbers)),
+            Arc::new(Int64Array::from(block_partitions)),
             Arc::new(StringArray::from(block_hashes)),
             Arc::new(StringArray::from(block_parent_hashes)),
             Arc::new(BinaryArray::from_iter_values(block_data)),
