@@ -114,7 +114,7 @@ impl DeltaLakeProducer {
         let arrow_schema = <ArrowSchema as TryFrom<&Schema>>::try_from(&metadata.schema.clone())
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
 
-        assert_eq!(arrow_schema.fields.len(), 5);
+        assert_eq!(arrow_schema.fields.len(), 6);
         let schema_ref = Arc::new(arrow_schema);
 
         let writer = RecordBatchWriter::for_table(&table)?;
