@@ -198,8 +198,8 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             block_numbers.push(block.get_number() as i64);
             block_hashes.push(block.get_hash());
             block_parent_hashes.push(block.get_parent_hash());
-            let binding = block.encode_to_vec();
-            block_data.push(binding);
+            let block_bytes = block.encode_to_vec();
+            block_data.push(block_bytes);
             created_ats.push(block.get_writer_timestamp() as i64);
             block_zorder.push((block.get_number() % self.block_zorder as u64) as i64);
         }
