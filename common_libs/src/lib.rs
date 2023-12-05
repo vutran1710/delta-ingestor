@@ -22,7 +22,6 @@ pub use tokio_stream;
 pub use uuid;
 pub use warp;
 
-pub mod delta_utils;
 pub mod load_balancer;
 pub mod proto_utils;
 pub mod utils;

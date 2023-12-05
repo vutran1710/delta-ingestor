@@ -115,13 +115,13 @@ async fn test_ingestor_core_01() {
     log::info!(
         "=>> published: {:?}",
         published_blocks
-            .lock()
+            .read()
             .await
             .iter()
             .map(|b| b.get_number())
             .collect::<Vec<u64>>()
     );
-    let blocks_count = published_blocks.lock().await.len();
+    let blocks_count = published_blocks.read().await.len();
     assert_eq!(blocks_count, 6);
     assert_eq!(resumer_last_block_number(&resumer).await, Some(5));
 }
@@ -226,14 +226,14 @@ async fn test_ingestor_core_reorg_01() {
     };
 
     let published_block_numbers = published_blocks
-        .lock()
+        .read()
         .await
         .iter()
         .map(|b| b.get_number())
         .collect::<Vec<u64>>();
     let check_blocks_on_chain = client
         .block_store
-        .are_blocks_on_chain(&published_blocks.lock().await)
+        .are_blocks_on_chain(&published_blocks.read().await)
         .await;
     let published_blocks = published_block_numbers
         .into_iter()
@@ -283,14 +283,14 @@ async fn test_ingestor_core_reorg_02() {
     };
 
     let published_block_numbers = published_blocks
-        .lock()
+        .read()
         .await
         .iter()
         .map(|b| b.get_number())
         .collect::<Vec<u64>>();
     let check_blocks_on_chain = client
         .block_store
-        .are_blocks_on_chain(&published_blocks.lock().await)
+        .are_blocks_on_chain(&published_blocks.read().await)
         .await;
     let published_blocks = published_block_numbers
         .into_iter()
@@ -366,14 +366,14 @@ async fn test_ingestor_core_reorg_with_resume() {
     };
 
     let published_block_numbers = published_blocks
-        .lock()
+        .read()
         .await
         .iter()
         .map(|b| b.get_number())
         .collect::<Vec<u64>>();
     let check_blocks_on_chain = client
         .block_store
-        .are_blocks_on_chain(&published_blocks.lock().await)
+        .are_blocks_on_chain(&published_blocks.read().await)
         .await;
     let published_blocks = published_block_numbers
         .into_iter()
