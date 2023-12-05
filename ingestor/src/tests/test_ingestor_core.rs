@@ -164,7 +164,7 @@ async fn test_ingestor_core_02() {
             .map(|b| b < cancel_block)
             .unwrap_or(true)
         {
-            sleep(Duration::from_secs(1)).await;
+            sleep(Duration::from_millis(100)).await;
         }
         log::info!("Stopping ingestor");
     };
