@@ -91,12 +91,6 @@ impl DeltaLakeProducer {
                     false,
                     HashMap::default(),
                 ),
-                SchemaField::new(
-                    "block_zorder".to_string(),
-                    SchemaDataType::primitive("long".to_string()),
-                    false,
-                    HashMap::default(),
-                ),
             ],
             DeltaLakeProducer::get_table_config(),
         )
@@ -114,7 +108,6 @@ impl DeltaLakeProducer {
         let arrow_schema = <ArrowSchema as TryFrom<&Schema>>::try_from(&metadata.schema.clone())
             .map_err(|e| ProducerError::Initialization(format!("{:?}", e)))?;
 
-        assert_eq!(arrow_schema.fields.len(), 6);
         let schema_ref = Arc::new(arrow_schema);
 
         let writer = RecordBatchWriter::for_table(&table)?;
@@ -136,16 +129,10 @@ impl DeltaLakeProducer {
             DeltaConfigKey::AutoOptimizeAutoCompact,
             Some("true".to_string()),
         );
-        // TODO: we should determine the exact value here
-        // table_config.insert(
-        //     DeltaConfigKey::LogRetentionDuration,
-        //     Some("100".to_string()),
-        // );
-        // table_config.insert(
-        //     DeltaConfigKey::DeletedFileRetentionDuration,
-        //     Some("20".to_string()),
-        // );
-        // table_config.insert(DeltaConfigKey::CheckpointInterval, Some("10".to_string()));
+        table_config.insert(
+            DeltaConfigKey::DataSkippingNumIndexedCols,
+            Some("1".to_string()),
+        );
         return table_config;
     }
 
@@ -154,7 +141,10 @@ impl DeltaLakeProducer {
         columns: Vec<SchemaField>,
         table_config: HashMap<DeltaConfigKey, Option<String>>,
     ) -> Result<(DeltaTable, bool), ProducerError> {
-        info!("Opening table at: {table_path}");
+        info!(
+            "Opening table at: {table_path}, config={} keys",
+            table_config.len()
+        );
         let mut table = DeltaTableBuilder::from_uri(table_path)
             .with_allow_http(true)
             .build()
@@ -192,7 +182,6 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
         let mut block_parent_hashes = vec![];
         let mut block_data = vec![];
         let mut created_ats = vec![];
-        let mut block_zorder = vec![];
 
         for block in blocks {
             block_numbers.push(block.get_number() as i64);
@@ -201,7 +190,6 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             let block_bytes = block.encode_to_vec();
             block_data.push(block_bytes);
             created_ats.push(block.get_writer_timestamp() as i64);
-            block_zorder.push((block.get_number() % self.block_zorder as u64) as i64);
         }
 
         let arrow_array: Vec<Arc<dyn Array>> = vec![
@@ -210,7 +198,6 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             Arc::new(StringArray::from(block_parent_hashes)),
             Arc::new(BinaryArray::from_iter_values(block_data)),
             Arc::new(Int64Array::from(created_ats)),
-            Arc::new(Int64Array::from(block_zorder)),
         ];
 
         let batch = RecordBatch::try_new(self.schema_ref.clone(), arrow_array).unwrap();
