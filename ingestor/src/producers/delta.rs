@@ -50,6 +50,7 @@ pub struct DeltaLakeProducer {
     schema_ref: Arc<ArrowSchema>,
     chain_name: String,
     table_path: String,
+    block_zorder: u32,
 }
 
 impl DeltaLakeProducer {
@@ -123,6 +124,7 @@ impl DeltaLakeProducer {
             schema_ref,
             chain_name: cfg.chain.to_string(),
             table_path: deltalake_cfg.table_path,
+            block_zorder: cfg.block_zorder,
         };
         Ok(delta_lake_client)
     }
@@ -199,7 +201,7 @@ impl<B: BlockTrait> ProducerTrait<B> for DeltaLakeProducer {
             let binding = block.encode_to_vec();
             block_data.push(binding);
             created_ats.push(block.get_writer_timestamp() as i64);
-            block_zorder.push((block.get_number() % 5000) as i64);
+            block_zorder.push((block.get_number() % self.block_zorder as u64) as i64);
         }
 
         let arrow_array: Vec<Arc<dyn Array>> = vec![

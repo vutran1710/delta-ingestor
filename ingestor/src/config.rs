@@ -69,6 +69,9 @@ pub struct CommandConfig {
     #[clap(long, env = "BLOCK_TIME", default_value_t = 20)]
     #[arg(long = "block-time", default_value_t = 20)]
     pub block_time: u16,
+    #[clap(long, env = "BLOCK_ZORDER", default_value_t = 5000)]
+    #[arg(long = "block-zorder", default_value_t = 5000)]
+    pub block_zorder: u32,
 }
 
 impl Default for CommandConfig {
@@ -91,6 +94,7 @@ impl Default for CommandConfig {
             resumer_key: None,
             resumer: None,
             producer: None,
+            block_zorder: 1000,
         }
     }
 }
