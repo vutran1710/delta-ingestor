@@ -146,6 +146,18 @@ impl DeltaLakeProducer {
             DeltaConfigKey::DataSkippingNumIndexedCols,
             Some("2".to_string()),
         );
+        table_config.insert(
+            DeltaConfigKey::LogRetentionDuration,
+            Some("interval 7 days".to_string()),
+        );
+        table_config.insert(
+            DeltaConfigKey::DeletedFileRetentionDuration,
+            Some("interval 2 days".to_string()),
+        );
+        table_config.insert(
+            DeltaConfigKey::CheckpointInterval,
+            Some("interval 1 hour".to_string()),
+        );
         return table_config;
     }
 
