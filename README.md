@@ -8,7 +8,7 @@
 --batch 50 \
 --task-limit 50 \
 --channel-size 2 \
---block-zorder 5000 \
+--block-partition 100000 \
 --config secrets/ethereum.toml \
 --request-timeout 50 --producer delta --resumer redis://localhost:6379 --block-descriptor ./ingestor/src/proto/ethereum.desc
 ```
@@ -59,7 +59,7 @@ RUST_LOG=info cargo run -p ingestor -- \
 --config secrets/config.toml \
 --request-timeout 1 \
 --resumer redis://localhost:6379
---block-zorder 5000 // default: 5000
+--block-partition 100000 // default: 100_000
 ```
 
 ### Ingestor Mode
