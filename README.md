@@ -8,6 +8,7 @@
 --batch 50 \
 --task-limit 50 \
 --channel-size 2 \
+--block-partition 100000 \
 --config secrets/ethereum.toml \
 --request-timeout 50 --producer delta --resumer redis://localhost:6379 --block-descriptor ./ingestor/src/proto/ethereum.desc
 ```
@@ -43,6 +44,7 @@ There are optional & required values. Some required values are provided with def
 | METRICS_PORT | —metrics-port | u32 | 8060 |  | prometheus service port |
 | CHANNEL_SIZE | —channel-size | u8 | 50 | 5 | Number of downloaded block pool create in memory |
 | REQUEST_TIMEOUT | —request-timeout | u8 | 5 |  | http request timeout |
+| BLOCK_PARTITION | —block-partition | u32 | 100_000 | depend on chain | blocks-per-file partitioning |
 | CONFIG_FILE | —config | string | /etc/config/config.toml | use the sample_eth_config.toml in /secrets/ | config file RPC list endpoints  by chain |
 
 Example command:
@@ -57,6 +59,7 @@ RUST_LOG=info cargo run -p ingestor -- \
 --config secrets/config.toml \
 --request-timeout 1 \
 --resumer redis://localhost:6379
+--block-partition 100000 // default: 100_000
 ```
 
 ### Ingestor Mode

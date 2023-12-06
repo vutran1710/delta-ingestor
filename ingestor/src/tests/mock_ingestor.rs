@@ -12,7 +12,7 @@ use crate::proto::BlockChain;
 use crate::proto::BlockTrait;
 use crate::resumers::create_resumer;
 use crate::resumers::Resumer;
-use common_libs::tokio::sync::Mutex;
+use common_libs::tokio::sync::RwLock;
 use metrics::Registry;
 use std::sync::Arc;
 
@@ -25,7 +25,7 @@ pub async fn create_fake_ethereum_ingestor<B: BlockTrait>(
         Ingestor<B>,
         Arc<FakeClient>,
         Arc<Resumer<B>>,
-        Arc<Mutex<Vec<B>>>,
+        Arc<RwLock<Vec<B>>>,
     ),
     IngestorError,
 >
@@ -45,7 +45,7 @@ where
     let name_service = NameService::from((&cfg, BlockChain::Ethereum));
 
     let stdout_producer = create_producer(&cfg, &name_service).await?;
-    let mut blocks = Arc::new(Mutex::new(vec![]));
+    let mut blocks = Arc::new(RwLock::new(vec![]));
 
     if let Producer::StdOut(p) = &stdout_producer {
         blocks = p.blocks.clone();

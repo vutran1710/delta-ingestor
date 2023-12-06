@@ -69,9 +69,9 @@ pub struct CommandConfig {
     #[clap(long, env = "BLOCK_TIME", default_value_t = 20)]
     #[arg(long = "block-time", default_value_t = 20)]
     pub block_time: u16,
-    #[clap(long, env = "BLOCK_DESCRIPTOR")]
-    #[arg(long = "block-descriptor")]
-    pub block_descriptor: Option<String>,
+    #[clap(long, env = "BLOCK_PARTITION", default_value_t = 100000)]
+    #[arg(long = "block-partition", default_value_t = 100000)]
+    pub block_partition: u32,
 }
 
 impl Default for CommandConfig {
@@ -94,7 +94,7 @@ impl Default for CommandConfig {
             resumer_key: None,
             resumer: None,
             producer: None,
-            block_descriptor: None,
+            block_partition: 100_000,
         }
     }
 }
