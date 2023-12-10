@@ -6,7 +6,6 @@ data/
 gg.json
 /.vscode/
 /protobuf_rs/src/pb.rs
-secrets/
 node_modules/
 *.db
 secrets.toml
