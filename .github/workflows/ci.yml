@@ -71,7 +71,7 @@ jobs:
           command: test
 
   build_and_push:
-    if: github.ref == 'refs/heads/main'
+#    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
