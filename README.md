@@ -1,4 +1,7 @@
-# Delta Ingestor
+Delta Ingestor
+====
+
+[![Build And Publish Image](https://github.com/datafast-network/delta-ingestor/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/datafast-network/delta-ingestor/actions/workflows/build.yaml)
 
 ##  Quick start
 ```sh

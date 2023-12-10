@@ -1,4 +1,4 @@
-name: DataOnChain-CI
+name: Check And Verify
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ env:
   CI: true
   CARGO_TERM_COLOR: always
   REDIS: redis://localhost:6379
-  RPC: https://cloudflare-eth.com/
+  RPC: ${{ vars.RPC }}
   RUST_LOG: info
 
 jobs:
