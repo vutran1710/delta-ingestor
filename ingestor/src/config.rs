@@ -54,8 +54,8 @@ pub struct CommandConfig {
     #[clap(long, env = "CHANNEL_SIZE", default_value_t = 2)]
     #[arg(long = "channel-size", default_value_t = 2)]
     pub channel_size: u16,
-    #[clap(long, env = "REQUEST_TIMEOUT", default_value_t = 2)]
-    #[arg(long = "request-timeout", default_value_t = 2)]
+    #[clap(long, env = "REQUEST_TIMEOUT", default_value_t = 10)]
+    #[arg(long = "request-timeout", default_value_t = 10)]
     pub request_timeout: u8,
     #[clap(long, env = "LOAD_BALANCER_BLOCKING", default_value_t = 10)]
     #[arg(long = "lb-blocking", default_value_t = 10)]

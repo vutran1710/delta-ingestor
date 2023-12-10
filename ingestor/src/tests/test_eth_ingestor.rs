@@ -10,7 +10,6 @@ async fn test_init_ingestor_stdouts() {
     let mut cfg = CommandConfig::default();
     cfg.key_prefix = "stdouts".to_string();
     cfg.config_file = "../secrets/ethereum.toml".to_string();
-    cfg.request_timeout = 10;
     assert_eq!(IngestorMode::from(&cfg), IngestorMode::StdOut);
     eth::create_ingestor(&cfg, &registry).await.unwrap();
 }
@@ -22,7 +21,6 @@ async fn test_init_ingestor_no_bus() {
     cfg.key_prefix = "stdouts".to_string();
     cfg.resumer = Some("redis://localhost:6379".to_string());
     cfg.config_file = "../secrets/ethereum.toml".to_string();
-    cfg.request_timeout = 10;
     assert_eq!(IngestorMode::from(&cfg), IngestorMode::NoProducer);
     eth::create_ingestor(&cfg, &registry).await.unwrap();
 }

@@ -1,10 +1,6 @@
 name: Build And Publish Image
 
 on:
-  pull_request:
-    branches: [ "main" ]
-    types: [opened, synchronize, reopened]
-
   push:
     branches:
       - main
@@ -15,7 +11,7 @@ env:
 
 jobs:
   build_and_push:
-    #    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: self-hosted
     steps:
       - name: Check out the repo
