@@ -1,4 +1,4 @@
-name: DataOnChain-CI
+name: Check And Verify
 
 on:
   pull_request:
