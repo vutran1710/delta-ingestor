@@ -1,3 +1,4 @@
+use common_libs::deltalake::parquet::file::properties::WriterProperties;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -119,7 +120,11 @@ impl DeltaLakeProducer {
 
         let schema_ref = Arc::new(arrow_schema);
 
-        let writer = RecordBatchWriter::for_table(&table)?;
+        let writer = RecordBatchWriter::for_table(&table)?.with_writer_properties(
+            WriterProperties::builder()
+                .set_compression(common_libs::deltalake::parquet::basic::Compression::LZ4)
+                .build(),
+        );
         let delta_lake_client = Self {
             table: Arc::new(Mutex::new(table)),
             writer: Arc::new(Mutex::new(writer)),
